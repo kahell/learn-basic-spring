@@ -1,8 +1,11 @@
 package kahellfoundation.spring.core;
 
+import kahellfoundation.spring.core.data.MultiFoo;
 import kahellfoundation.spring.core.repository.CategoryRepository;
+import kahellfoundation.spring.core.repository.CustomerRepository;
 import kahellfoundation.spring.core.repository.ProductRepository;
 import kahellfoundation.spring.core.service.CategoryService;
+import kahellfoundation.spring.core.service.CustomerService;
 import kahellfoundation.spring.core.service.ProductService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,5 +45,21 @@ public class ComponentConfigurationTest {
         CategoryRepository categoryRepository = applicationContext.getBean(CategoryRepository.class);
 
         Assertions.assertSame(categoryRepository, categoryService.getCategoryRepository());
+    }
+
+    @Test
+    void testFieldDependencyInjection(){
+        CustomerService customerService = applicationContext.getBean(CustomerService.class);
+        CustomerRepository normalCustomerRepository = applicationContext.getBean("normalCustomerRepository",CustomerRepository.class);
+        CustomerRepository premiumCustomerRepository = applicationContext.getBean("premiumCustomerRepository",CustomerRepository.class);
+
+        Assertions.assertSame(normalCustomerRepository, customerService.getNormalCustomerRepository());
+        Assertions.assertSame(premiumCustomerRepository, customerService.getPremiumCustomerRepository());
+    }
+
+    @Test
+    void testObjectProvider(){
+        MultiFoo multiFoo = applicationContext.getBean(MultiFoo.class);
+        Assertions.assertEquals(3, multiFoo.getFoos().size());
     }
 }
